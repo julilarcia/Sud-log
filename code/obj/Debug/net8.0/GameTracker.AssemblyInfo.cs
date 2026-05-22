@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GameTracker")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+85f6d43c09e7fb5591f415902dd5d86e02fb8c38")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+47a1ae4d1e2a7e961bd71d351f4439757a0f6ceb")]
 [assembly: System.Reflection.AssemblyProductAttribute("GameTracker")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GameTracker")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

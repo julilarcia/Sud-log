@@ -1,6 +1,13 @@
 
 using Microsoft.EntityFrameworkCore;
+using GameTracker.Models;
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Dodanie obsługi bazy danych SQLite
+builder.Services.AddDbContext<GameTrackerContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
