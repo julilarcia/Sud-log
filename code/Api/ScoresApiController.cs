@@ -44,29 +44,50 @@ namespace GameTracker.Api
         [HttpPost]
         public async Task<IActionResult> PostScore([FromBody] ScoreSubmitDto scoreData)
         {
-            // 1. Sprawdzamy czy gracz i poziom istnieją w bazie
-            var user = await _context.Users.FindAsync(scoreData.UserId);
-            var level = await _context.GameLevels.FindAsync(scoreData.GameLevelId);
-
-            if (user == null || level == null)
+            // 1. Odbieranie danych z nagłówków żądania HTTP (ZADANIE 3)
+            if (!Request.Headers.TryGetValue("X-Player-Login", out var requestLogin) ||
+                !Request.Headers.TryGetValue("X-Api-Key", out var requestApiKey))
             {
-                return BadRequest("Nie znaleziono gracza lub poziomu o podanym ID.");
+                // Jeśli brakuje któregoś z nagłówków, przerywamy i zwracamy kod 401 (Brak autoryzacji)
+                return Unauthorized("Brak wymaganych nagłówków autoryzacyjnych: X-Player-Login lub X-Api-Key.");
             }
 
-            // 2. utworzenia nowego wyniku
+            // 2. Weryfikacja: Szukamy użytkownika o podanym loginie i sprawdzamy jego ApiKey
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Login == requestLogin.ToString() && u.ApiKey == requestApiKey.ToString());
+
+            if (user == null)
+            {
+                return Unauthorized("Nieautoryzowany dostęp: Niepoprawny login lub klucz API.");
+            }
+
+            // 3. Sprawdzamy czy poziom gry istnieje w bazie
+            var level = await _context.GameLevels.FindAsync(scoreData.GameLevelId);
+            if (level == null)
+            {
+                return BadRequest("Nie znaleziono poziomu o podanym ID.");
+            }
+
+            // 4. Bezpieczeństwo: Upewniamy się, że gracz wysyła wynik dla SAMEGO SIEBIE
+            // (Zapobiega to sytuacji, gdzie Gracz A wysyła punkty na konto Gracza B)
+            if (user.Id != scoreData.UserId)
+            {
+                return BadRequest("Identyfikator zalogowanego użytkownika nie zgadza się z ID w przesyłanym wyniku.");
+            }
+
+            // 5. Tworzymy i zapisujemy nowy wynik
             var newScore = new Score
             {
-                UserId = scoreData.UserId,
+                UserId = user.Id,
                 GameLevelId = scoreData.GameLevelId,
                 Points = scoreData.Points,
                 DateAchieved = DateTime.Now
             };
 
-            // 3. Zapis w bazie
             _context.Scores.Add(newScore);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Wynik zapisany pomyślnie!", scoreId = newScore.Id });
+            return Ok(new { message = "Wynik zapisany pomyślnie przez API!", scoreId = newScore.Id });
         }
     }
 
