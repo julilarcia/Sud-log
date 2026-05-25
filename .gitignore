@@ -13,3 +13,6 @@
 # Ustawienia lokalne środowiska (opcjonalnie)
 .vscode/
 appsettings.Development.json
+
+GameTrackerData.db-shm 
+GameTrackerData.db-wal
