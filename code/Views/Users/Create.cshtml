@@ -1,57 +1,35 @@
-@model GameTracker.ViewModels.CreateUserViewModel
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Dodaj nowego gracza</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/Users/Create">
+                    
+                    <div asp-validation-summary="All" class="text-danger fw-bold mb-3"></div>
 
-@{
-    ViewData["Title"] = "Dodaj użytkownika";
-}
-
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">➕ Dodaj nowego użytkownika</h4>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Create" method="post">
-                        @Html.AntiForgeryToken()
-                        <div class="mb-3">
-                            <label asp-for="Login" class="form-label"></label>
-                            <input asp-for="Login" class="form-control" />
-                            <span asp-validation-for="Login" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label"></label>
-                            <input asp-for="Password" class="form-control" />
-                            <span asp-validation-for="Password" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Role" class="form-label"></label>
-                            <select asp-for="Role" class="form-select">
-                                <option value="Player">Player</option>
-                                <option value="Admin">Admin</option>
-                            </select>
-                            <span asp-validation-for="Role" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="ApiKey" class="form-label"></label>
-                            <input asp-for="ApiKey" class="form-control" />
-                            <span asp-validation-for="ApiKey" class="text-danger"></span>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center">
-                            <button type="submit" class="btn btn-success">Zapisz użytkownika</button>
-                            <a asp-controller="Users" asp-action="Index" class="btn btn-secondary">Powrót do listy</a>
-                        </div>
-                    </form>
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label">Login:</label>
+                        <input type="text" name="login" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hasło:</label>
+                        <input type="password" name="password" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rola:</label>
+                        <select name="role" class="form-select">
+                            <option value="Player">Gracz</option>
+                            <option value="Admin">Administrator</option>
+                        </select>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success flex-grow-1">Zapisz</button>
+                        <a href="/Users/Index" class="btn btn-secondary">Anuluj</a>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

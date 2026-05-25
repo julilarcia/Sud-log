@@ -44,6 +44,12 @@ namespace GameTracker.Controllers
 
             return View(users);
         }
+        [HttpGet]
+        public IActionResult Create()
+        {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+            return View();
+        }
 
         [HttpPost]
         public IActionResult Create(string login, string password, string role)
