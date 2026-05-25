@@ -1,0 +1,38 @@
+@model IEnumerable<GameTracker.Models.GameLevel>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>🎮 Zarządzanie Poziomami Gry</h2>
+        <a href="/GameLevels/Create" class="btn btn-success">➕ Dodaj Nowy Poziom</a>
+    </div>
+
+    <table class="table table-striped shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nazwa Poziomu</th>
+                <th>Mnożnik Trudności</th>
+                <th class="text-center">Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td><strong>@item.Name</strong></td>
+                    <td>@item.DifficultyMultiplier x</td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="/GameLevels/Edit/@item.Id" class="btn btn-warning btn-sm">Edytuj</a>
+                            
+                            <form action="/GameLevels/Delete/@item.Id" method="post" onsubmit="return confirm('Czy na pewno chcesz usunąć ten poziom?');">
+                                <button type="submit" class="btn btn-danger btn-sm">Usuń</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

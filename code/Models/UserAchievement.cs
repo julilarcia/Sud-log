@@ -1,20 +1,23 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class UserAchievement
+namespace GameTracker.Models
 {
-    [Key]
-    public int Id { get; set; }
+    public class UserAchievement
+    {
+        [Key]
+        public int Id { get; set; }
 
-    public DateTime DateUnlocked { get; set; } = DateTime.Now;
+        public DateTime DateUnlocked { get; set; } = DateTime.Now;
 
-    // KLUCZE OBCE
-    public int UserId { get; set; }
-    [ForeignKey("UserId")]
-    public User? User { get; set; }
+        // KLUCZE OBCE
+        public int UserId { get; set; }
+        [ForeignKey("UserId")]
+        public User? User { get; set; }
 
-    public int AchievementId { get; set; }
-    [ForeignKey("AchievementId")]
-    public Achievement? Achievement { get; set; }
+        public int AchievementId { get; set; }
+        [ForeignKey("AchievementId")]
+        public Achievement? Achievement { get; set; }
 
+    }
 }

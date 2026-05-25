@@ -1,0 +1,26 @@
+@model IEnumerable<GameTracker.Models.User>
+
+<div class="container mt-4">
+    <h2>👥 Zarządzanie Graczami</h2>
+    <table class="table table-striped shadow-sm mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Login</th>
+                <th>Rola</th>
+                <th>Klucz API</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td><strong>@user.Login</strong></td>
+                    <td>@user.Role</td>
+                    <td><code>@user.ApiKey</code></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

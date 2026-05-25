@@ -1,16 +1,19 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class Achievement
+namespace GameTracker.Models
 {
-    [Key]
-    public int Id { get; set; }
-    
-    [Required]
-    public string Name { get; set; } 
-    
-    public string Description { get; set; } 
+    public class Achievement
+    {
+        [Key]
+        public int Id { get; set; }
 
-    public ICollection<UserAchievement>? UserAchievements { get; set; }
+        [Required]
+        public string Name { get; set; } = string.Empty;
 
+        public string Description { get; set; } = string.Empty;
+
+        public ICollection<UserAchievement>? UserAchievements { get; set; }
+
+    }
 }

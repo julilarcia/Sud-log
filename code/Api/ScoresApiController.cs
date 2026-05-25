@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GameTracker.Models;
 
+
 namespace GameTracker.Api
 {
     //Konfiguracja trasy i typu kontrolera

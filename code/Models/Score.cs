@@ -1,10 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-public class Score
+
+namespace GameTracker.Models
 {
-    [Key]
+    public class Score
+    {
+        [Key]
         public int Id { get; set; }
-        
+
         public int Points { get; set; }
         public DateTime DateAchieved { get; set; } = DateTime.Now;
 
@@ -17,4 +20,5 @@ public class Score
         [ForeignKey("GameLevelId")]
         public GameLevel? GameLevel { get; set; }
 
+    }
 }
