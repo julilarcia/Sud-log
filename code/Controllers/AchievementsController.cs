@@ -41,13 +41,11 @@ namespace GameTracker.Controllers
         {
             if (!IsAdmin()) return RedirectToAction("Index", "Home");
 
-            if (ModelState.IsValid)
-            {
-                _context.Achievements.Add(achievement);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(achievement);
+            achievement.Id = 0; // Baza nadaje ID automatycznie
+            _context.Achievements.Add(achievement);
+            _context.SaveChanges();
+            
+            return RedirectToAction("Index");
         }
 
         // GET: /Achievements/Edit/5
