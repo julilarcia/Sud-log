@@ -1,64 +1,453 @@
 Markdown
-# 🎮 GameTracker
+# GameTracker
 
-## 👥 Autorzy
-* **Osoba A (Lider backendu i zarządzania danymi):** Kaja [Wpisz Nazwisko]
-* **Osoba B (Lider autoryzacji i widoków publicznych):** [Wpisz Imię i Nazwisko koleżanki]
+## Opis projektu
 
----
+GameTracker to aplikacja internetowa napisana w technologii **ASP.NET Core MVC** z wykorzystaniem **REST API**, **Entity Framework Core** oraz bazy danych **SQLite**.
 
-## 🎯 Cel Aplikacji
-GameTracker to kompletny system webowy działający w architekturze Klient-Serwer, służący do gromadzenia i analizy wyników graczy, a także zarządzania trybami trudności i odznakami. Projekt powstał w technologii **ASP.NET Core (MVC + REST API)** oraz **SQLite** (baza danych z obsługą Entity Framework Core). 
-
-Projekt dzieli się na dwa połączone ze sobą moduły:
-1. **Aplikacja Serwerowa (Portal Webowy):** Oferuje bezpieczny system logowania oparty na mechanizmie Sesji, publiczne Tabele Wyników oraz chroniony Panel Administratora (dostępny tylko dla ról 'Admin') pozwalający na zarządzanie zasobami (graczami, poziomami gry i osiągnięciami).
-2. **Aplikacja Kliencka (Symulator Gry):** Niezależny program konsolowy wysyłający asynchroniczne żądania `HTTP POST` do serwera, symulujący kończenie rozgrywki przez gracza.
+System służy do gromadzenia, zarządzania i analizowania wyników graczy. Aplikacja umożliwia logowanie użytkowników, zapisywanie wyników rozgrywek, zarządzanie poziomami gry, osiągnięciami oraz prezentowanie rankingów i profili graczy.
 
 ---
 
-## 🚀 Instrukcja Uruchomienia (Serwer + Baza Danych)
+## Autorzy
 
-1. Sklonuj repozytorium na swój komputer.
-2. Otwórz folder główny projektu (ten zawierający folder `code`) w terminalu / VS Code.
-3. Przejdź do folderu z serwerem:
-   ```bash
-   cd code
+- **Kaja Dragun** : kdragun@student.agh.edu.pl
+
+- **Julia Dorobis** : jdorobis@student.agh.edu.pl
+---
+
+## Technologie
+
+Projekt wykorzystuje:
+
+- ASP.NET Core MVC
+- REST API
+- Entity Framework Core
+- SQLite
+- Razor Views
+- Sesje ASP.NET Core
+- C#
+- Bootstrap
+- Konsolową aplikację kliencką z `HttpClient`
+
+---
+
+## Główne funkcjonalności
+
+### Aplikacja webowa
+
+Aplikacja webowa umożliwia:
+
+- logowanie użytkowników,
+- wylogowanie użytkownika,
+- zapamiętywanie zalogowanego użytkownika przy pomocy mechanizmu sesji,
+- zabezpieczenie wybranych widoków przed dostępem niezalogowanych użytkowników,
+- zarządzanie poziomami gry,
+- zarządzanie osiągnięciami,
+- zarządzanie użytkownikami przez administratora,
+- przeglądanie wyników,
+- wyświetlanie rankingu graczy,
+- wyświetlanie profilu gracza z historią gier i odblokowanymi osiągnięciami.
+
+### REST API
+
+Aplikacja udostępnia REST API umożliwiające:
+
+- pobieranie wyników,
+- dodawanie nowych wyników,
+- modyfikowanie danych,
+- usuwanie danych,
+- autoryzację żądań na podstawie loginu użytkownika oraz klucza API.
+
+Autoryzacja REST API odbywa się przez przesyłanie danych w nagłówkach HTTP:
+
+```http
+X-Player-Login: login_uzytkownika
+X-Api-Key: klucz_api
+```
+
+### Aplikacja konsolowa
+
+Do projektu dołączona jest osobna aplikacja konsolowa, która demonstruje działanie REST API. Program symuluje klienta gry, wysyłając wynik gracza do serwera za pomocą żądania HTTP.
+
+---
+
+## Struktura bazy danych
+
+Aplikacja korzysta z bazy danych SQLite oraz Entity Framework Core. Dane są obsługiwane przez modele MVC, bez używania natywnych zapytań SQL w kodzie aplikacji.
+
+Główne tabele projektu:
+
+### `Users`
+
+Tabela użytkowników systemu.
+
+Przechowuje:
+
+- login,
+- skrót hasła,
+- rolę użytkownika,
+- klucz API.
+
+Tabela ta służy do obsługi logowania i autoryzacji.
+
+### `GameLevels`
+
+Tabela poziomów lub trybów gry.
+
+Przechowuje:
+
+- nazwę poziomu,
+- mnożnik trudności.
+
+### `Scores`
+
+Tabela wyników graczy.
+
+Przechowuje:
+
+- liczbę punktów,
+- datę uzyskania wyniku,
+- użytkownika, który uzyskał wynik,
+- poziom gry, na którym uzyskano wynik.
+
+Relacje:
+
+- `Scores` -> `Users`
+- `Scores` -> `GameLevels`
+
+### `Achievements`
+
+Tabela osiągnięć możliwych do zdobycia.
+
+Przechowuje:
+
+- nazwę osiągnięcia,
+- opis osiągnięcia.
+
+### `UserAchievements`
+
+Tabela łącząca użytkowników z odblokowanymi osiągnięciami.
+
+Przechowuje:
+
+- użytkownika,
+- osiągnięcie,
+- datę odblokowania osiągnięcia.
+
+Relacje:
+
+- `UserAchievements` -> `Users`
+- `UserAchievements` -> `Achievements`
+
+---
+
+## Role użytkowników
+
+System obsługuje role użytkowników.
+
+### Administrator
+
+Administrator może:
+
+- dodawać nowych użytkowników,
+- przeglądać istniejących użytkowników,
+- zarządzać poziomami gry,
+- zarządzać osiągnięciami,
+- przeglądać dane systemowe.
+
+### Gracz
+
+Gracz może:
+
+- zalogować się do aplikacji,
+- przeglądać swoje wyniki,
+- sprawdzić swój profil,
+- zobaczyć historię gier,
+- zobaczyć odblokowane osiągnięcia,
+- korzystać z funkcjonalności publicznych, takich jak ranking.
+
+---
+
+## Uruchomienie projektu
+
+### Wymagania
+
+Do uruchomienia projektu wymagane są:
+
+- .NET 8 SDK
+- Git
+- Visual Studio Code lub Visual Studio
+- SQLite obsługiwany przez Entity Framework Core
+
+---
+
+### 1. Sklonowanie repozytorium
+
+```bash
+git clone https://github.com/julilarcia/GameTracker.git
+cd GameTracker
+```
+
+---
+
+### 2. Uruchomienie aplikacji serwerowej
+
+Przejdź do folderu aplikacji MVC:
+
+```bash
+cd code
+```
+
+Przywróć zależności:
+
+```bash
+dotnet restore
+```
+
 Uruchom aplikację:
 
-Bash
+```bash
 dotnet run
-Data Seeding: Przy pierwszym uruchomieniu system sam stworzy plik bazy danych GameTrackerData.db i doda domyślne konto Administratora:
+```
 
+Po uruchomieniu aplikacja będzie dostępna pod adresem wyświetlonym w terminalu, na przykład:
+
+```text
+http://localhost:5264
+```
+
+lub:
+
+```text
+https://localhost:7264
+```
+
+---
+
+## Baza danych
+
+Aplikacja korzysta z pliku bazy danych SQLite:
+
+```text
+GameTrackerData.db
+```
+
+Jeżeli baza danych nie istnieje, zostanie utworzona podczas uruchamiania aplikacji lub po wykonaniu migracji Entity Framework Core.
+
+W przypadku konieczności ręcznego utworzenia lub aktualizacji bazy danych można użyć polecenia:
+
+```bash
+dotnet ef database update
+```
+
+---
+
+## Domyślne konto administratora
+
+Przy pierwszym uruchomieniu aplikacji powinno zostać utworzone konto administratora.
+
+Domyślne dane logowania:
+
+```text
 Login: admin
-
 Hasło: admin123
+ApiKey: API-KEY-123
+```
 
-🔌 Instrukcja Testowania REST API (Program Konsolowy)
-Zabezpieczone REST API pozwala na automatyczne wysyłanie punktów "z gry" na serwer. Wymaga ono autoryzacji z użyciem nagłówków HTTP (X-Player-Login oraz X-Api-Key).
+Konto administratora służy do zarządzania użytkownikami, poziomami gry oraz osiągnięciami.
 
-Aby przetestować wysyłanie danych:
+---
 
-Upewnij się, że główny Serwer (krok wyżej) cały czas działa w tle. Zapisz port, na którym działa serwer (np. http://localhost:5264).
+## Testowanie REST API
 
-Otwórz nową kartę terminala i przejdź do folderu z aplikacją kliencką:
+Do przetestowania REST API służy osobna aplikacja konsolowa znajdująca się w folderze:
 
-Bash
-cd GameTrackerClient
-Uruchom symulator:
+```text
+GameTrackerClient
+```
 
-Bash
+### 1. Uruchomienie serwera
+
+Najpierw należy uruchomić główną aplikację MVC:
+
+```bash
+cd code
 dotnet run
-Postępuj zgodnie z instrukcjami na ekranie. Użyj danych startowego administratora, by wysłać pierwszy wynik:
+```
 
-Twój login: admin
+Należy zapamiętać adres oraz port serwera wyświetlony w terminalu.
 
-Twój ApiKey: API-KEY-123
+---
 
-ID poziomu: 1
+### 2. Uruchomienie aplikacji konsolowej
 
-Punkty: (wpisz dowolną liczbę)
+W nowym terminalu przejdź do folderu klienta:
 
-Program konsolowy powinien wyświetlić na zielono komunikat o sukcesie zwrócony bezpośrednio przez Serwer.
+```bash
+cd GameTrackerClient
+```
 
+Uruchom aplikację:
 
-Zapisz plik `README.md` (`Cmd + S`) i to wszystko! Twój projekt jest teraz profesjonalnie opisany, ma zabezpieczone API, zahasowane hasła, ochronę przed zajętymi portami i piękny panel administratora. Jesteście gotowe do commitowania i wysłania tego cudeńka do prowadzącego!
+```bash
+dotnet run
+```
+
+Program poprosi o dane potrzebne do wysłania wyniku do API.
+
+Przykładowe dane testowe:
+
+```text
+Login: admin
+ApiKey: API-KEY-123
+Id poziomu: 1
+Punkty: 500
+```
+
+Po poprawnym wysłaniu żądania aplikacja konsolowa powinna wyświetlić komunikat potwierdzający zapis wyniku.
+
+---
+
+## Przykład żądania REST API
+
+Przykładowe żądanie dodania wyniku:
+
+```http
+POST /api/ScoresApi
+Content-Type: application/json
+X-Player-Login: admin
+X-Api-Key: API-KEY-123
+```
+
+Przykładowe ciało żądania:
+
+```json
+{
+  "gameLevelId": 1,
+  "points": 500
+}
+```
+
+---
+
+## Najważniejsze widoki aplikacji
+
+Aplikacja zawiera następujące widoki:
+
+- strona główna,
+- logowanie,
+- panel użytkownika,
+- profil gracza,
+- historia wyników,
+- ranking graczy,
+- panel zarządzania użytkownikami,
+- panel zarządzania poziomami gry,
+- panel zarządzania osiągnięciami.
+
+Wszystkie główne funkcjonalności są dostępne z poziomu menu aplikacji, bez konieczności ręcznego wpisywania adresów URL.
+
+---
+
+## Leaderboard
+
+Aplikacja zawiera ranking graczy, który stanowi dodatkową funkcjonalność analityczną wykraczającą poza proste wyświetlanie zawartości tabel.
+
+Ranking może prezentować między innymi:
+
+- login gracza,
+- sumę zdobytych punktów,
+- liczbę rozegranych gier,
+- najlepszy wynik gracza.
+
+Dane są wyliczane na podstawie zapisanych wyników w tabeli `Scores`.
+
+---
+
+## Profil gracza
+
+Profil gracza prezentuje dane aktualnie zalogowanego użytkownika.
+
+Widok profilu zawiera:
+
+- login użytkownika,
+- rolę użytkownika,
+- liczbę rozegranych gier,
+- sumę zdobytych punktów,
+- historię wyników,
+- listę odblokowanych osiągnięć.
+
+---
+
+## Zgodność z wymaganiami laboratorium
+
+| Wymaganie | Realizacja w projekcie |
+| --- | --- |
+| Aplikacja ASP.NET Core MVC | Projekt serwerowy w folderze `code` |
+| Minimum 4 tabele bazy danych | `GameLevels`, `Scores`, `Achievements`, `UserAchievements` |
+| Obsługa bazy SQLite | `GameTrackerData.db`, Entity Framework Core |
+| Dostęp do bazy przez modele MVC | Folder `Models`, `GameTrackerContext` |
+| Zarządzanie danymi przez interfejs webowy | Kontrolery i widoki CRUD |
+| Dane startowe przy pierwszym uruchomieniu | Domyślny administrator oraz dane początkowe |
+| Logowanie i sesja | `AccountController`, `HttpContext.Session` |
+| Hasła w formie skrótu | `PasswordHash`, `PasswordHelper` |
+| Tylko administrator zarządza użytkownikami | `UsersController` |
+| Dodatkowe zestawienia | `Leaderboard`, profil gracza |
+| REST API | `ScoresApiController` |
+| Autoryzacja REST API tokenem | Nagłówki `X-Player-Login` i `X-Api-Key` |
+| Program konsolowy do API | Projekt `GameTrackerClient` |
+| Dokumentacja | Plik `README.md` |
+
+---
+
+## Struktura projektu
+
+```text
+GameTracker
+├── code
+│   ├── Api
+│   │   └── ScoresApiController.cs
+│   ├── Controllers
+│   │   ├── AccountController.cs
+│   │   ├── AchievementsController.cs
+│   │   ├── GameLevelsController.cs
+│   │   ├── HomeController.cs
+│   │   ├── LeaderboardController.cs
+│   │   ├── ScoresController.cs
+│   │   └── UsersController.cs
+│   ├── Helpers
+│   │   └── PasswordHelper.cs
+│   ├── Models
+│   │   ├── Achievement.cs
+│   │   ├── GameLevel.cs
+│   │   ├── GameTrackerContext.cs
+│   │   ├── Score.cs
+│   │   ├── User.cs
+│   │   └── UserAchievement.cs
+│   ├── ViewModels
+│   │   ├── LeaderboardViewModels.cs
+│   │   ├── ProfileViewModels.cs
+│   │   └── UserViewModels.cs
+│   ├── Views
+│   │   ├── Account
+│   │   ├── Achievements
+│   │   ├── GameLevels
+│   │   ├── Home
+│   │   ├── Leaderboard
+│   │   ├── Scores
+│   │   ├── Shared
+│   │   └── Users
+│   ├── Program.cs
+│   └── GameTracker.csproj
+├── GameTrackerClient
+│   ├── Program.cs
+│   └── GameTrackerClient.csproj
+├── README.md
+└── .gitignore
+```
+
+---
+
+## Licencja
+
+Projekt został przygotowany na potrzeby zajęć laboratoryjnych z przedmiotu Programowanie zaawansowane 2 w ramach toku studiów Informatyka i Systemy Inteligentne na Akademii Górniczo-Hutniczej.
