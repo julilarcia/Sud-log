@@ -22,9 +22,18 @@
 
                     @if (!ViewData.ModelState.IsValid)
                     {
-                        <div class="alert alert-danger" role="alert">
-                            @Html.ValidationMessage("")
-                        </div>
+                        var modelErrors = ViewData.ModelState[string.Empty]?.Errors;
+                        if (modelErrors != null && modelErrors.Count > 0)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                <ul class="mb-0">
+                                    @foreach (var err in modelErrors)
+                                    {
+                                        <li>@err.ErrorMessage</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
                     }
 
                     <div class="d-grid">
