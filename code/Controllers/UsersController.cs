@@ -45,47 +45,41 @@ namespace GameTracker.Controllers
             return View(users);
         }
 
-        [HttpGet]
-        public IActionResult Create()
-        {
-            if (!IsAdmin())
-            {
-                return RedirectToLogin();
-            }
-
-            return View(new CreateUserViewModel());
-        }
-
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Create(CreateUserViewModel model)
+        public IActionResult Create(string login, string password, string role)
         {
-            if (!IsAdmin())
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+
+            // 1. ZABEZPIECZENIE: Jeśli dane są puste, przerwij i pokaż błąd
+            if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
             {
-                return RedirectToLogin();
+                ModelState.AddModelError("", "Login i hasło nie mogą być puste!");
+                return View();
             }
 
-            if (!ModelState.IsValid)
+            // 2. Sprawdzamy czy login jest już zajęty
+            if (_context.Users.Any(u => u.Login == login))
             {
-                return View(model);
+                ModelState.AddModelError("", "Użytkownik o takim loginie już istnieje!");
+                return View();
             }
 
-            if (_context.Users.Any(u => u.Login == model.Login))
-            {
-                ModelState.AddModelError(nameof(model.Login), "Użytkownik o tej nazwie już istnieje.");
-                return View(model);
-            }
+            // Generujemy unikalny ApiKey dla gracza
+            string generatedApiKey = Guid.NewGuid().ToString("N");
 
-            var user = new User
+            // Tworzymy użytkownika
+            var newUser = new User
             {
-                Login = model.Login,
-                PasswordHash = PasswordHelper.HashPassword(model.Password),
-                Role = model.Role,
-                ApiKey = string.IsNullOrWhiteSpace(model.ApiKey) ? Guid.NewGuid().ToString("N") : model.ApiKey
+                Id = 0, // Wymuszenie autoincrement w SQLite
+                Login = login.Trim(),
+                PasswordHash = PasswordHelper.HashPassword(password), // Bezpieczny hash
+                Role = string.IsNullOrEmpty(role) ? "Player" : role,
+                ApiKey = generatedApiKey
             };
 
-            _context.Users.Add(user);
+            _context.Users.Add(newUser);
             _context.SaveChanges();
+
             return RedirectToAction("Index");
         }
     }
