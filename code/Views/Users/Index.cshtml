@@ -1,7 +1,11 @@
-@model IEnumerable<GameTracker.Models.User>
+@model IEnumerable<GameTracker.ViewModels.UserListItemViewModel>
 
 <div class="container mt-4">
-    <h2>👥 Zarządzanie Graczami</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>👥 Zarządzanie Graczami</h2>
+        <a asp-controller="Users" asp-action="Create" class="btn btn-success">➕ Dodaj nowego użytkownika</a>
+    </div>
+
     <table class="table table-striped shadow-sm mt-3">
         <thead class="table-dark">
             <tr>

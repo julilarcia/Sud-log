@@ -1,0 +1,43 @@
+@model IEnumerable<GameTracker.ViewModels.LeaderboardRowViewModel>
+
+@{
+    ViewData["Title"] = "Leaderboard";
+}
+
+<h2>Leaderboard</h2>
+<p>Ranking graczy wg łącznej liczby punktów.</p>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Gracz</th>
+            <th>Punkty</th>
+            <th>Rozegrane gry</th>
+            <th>Ostatnia gra</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="5">Brak wyników do wyświetlenia.</td>
+            </tr>
+        }
+        else
+        {
+            var rank = 1;
+            foreach (var row in Model)
+            {
+                <tr>
+                    <td>@rank</td>
+                    <td>@row.Login</td>
+                    <td>@row.TotalPoints</td>
+                    <td>@row.GamesPlayed</td>
+                    <td>@row.LastPlayed.ToString("yyyy-MM-dd HH:mm")</td>
+                </tr>
+                rank++;
+            }
+        }
+    </tbody>
+</table>
