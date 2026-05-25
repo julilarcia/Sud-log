@@ -1,0 +1,40 @@
+@{
+    ViewData["Title"] = "Logowanie";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow mt-5">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Logowanie do GameTracker</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/Account/Login">
+                    <div class="mb-3">
+                        <label for="login" class="form-label">Login:</label>
+                        <input type="text" class="form-control" id="login" name="login" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Hasło:</label>
+                        <input type="password" class="form-control" id="password" name="password" required />
+                    </div>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @Html.ValidationMessage("")
+                        </div>
+                    }
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Zaloguj się</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-light">
+                <p class="text-center text-muted mb-0">Nie masz konta? <a href="/Home/Index">Wróć na stronę główną</a></p>
+            </div>
+        </div>
+    </div>
+</div>

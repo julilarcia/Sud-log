@@ -27,6 +27,42 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
+                    <ul class="navbar-nav">
+                        @{
+                            string userId = null;
+                            string userLogin = null;
+                            try
+                            {
+                                userId = Context.Session?.GetString("UserId");
+                                userLogin = Context.Session?.GetString("UserLogin");
+                            }
+                            catch { }
+                        }
+                        
+                        @if (string.IsNullOrEmpty(userId))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Zaloguj się</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-dark dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    @userLogin
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Scores" asp-action="Index">Moje wyniki</a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Wyloguj się</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
         </nav>
