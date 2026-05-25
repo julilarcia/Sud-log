@@ -1,71 +1,92 @@
 using Microsoft.EntityFrameworkCore;
 using GameTracker.Models;
+using GameTracker.Helpers; // Wymagane do hashowania hasła!
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Dodanie obsługi bazy danych SQLite
 builder.Services.AddDbContext<GameTrackerContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add services to the container.
+// ==========================================
+// 1. DODANA OBSŁUGA SESJI (Zadanie 1 Osoby B)
+// ==========================================
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-//data seeding
+// ==========================================
+// 2. INICJALIZACJA DANYCH I NAPRAWA BAZY
+// ==========================================
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<GameTrackerContext>();
-        
-        // Upewniamy się, że baza danych jest stworzona
         context.Database.EnsureCreated();
 
-        // Jeśli nie ma żadnych użytkowników, dodaj pierwszego (Admina)
-        if (!context.Users.Any())
+        // SPOSÓB NA ZEPSUTE HASŁO: Szukamy starego admina i go usuwamy
+        var brokenAdmin = context.Users.FirstOrDefault(u => u.Login == "admin" && u.PasswordHash == "hashed_password_here");
+        if (brokenAdmin != null)
+        {
+            context.Users.Remove(brokenAdmin);
+            context.SaveChanges();
+            Console.WriteLine("--> Usunięto starego admina z zepsutym hasłem.");
+        }
+
+        // Dodajemy admina z prawdziwym hashem
+        if (!context.Users.Any(u => u.Login == "admin"))
         {
             context.Users.Add(new User 
             { 
                 Login = "admin", 
-                PasswordHash = "hashed_password_here", // W Etapie 2 podmienimy to na realny hash
+                PasswordHash = PasswordHelper.HashPassword("admin123"), // Poprawny Hash!
                 Role = "Admin",
-                ApiKey = "API-KEY-123" // Ten klucz podasz w symulatorze
+                ApiKey = "API-KEY-123" 
             });
             context.SaveChanges();
-            Console.WriteLine("--> Dodano domyślnego administratora.");
+            Console.WriteLine("--> Dodano administratora z POPRAWNYM hashem.");
         }
 
-        // Jeśli nie ma żadnych poziomów, dodaj przykładowy poziom
         if (!context.GameLevels.Any())
         {
-            context.GameLevels.Add(new GameLevel
-            {
-                Name = "Poziom Testowy",
-                DifficultyMultiplier = 1.0
-            });
+            context.GameLevels.Add(new GameLevel { Name = "Poziom Testowy", DifficultyMultiplier = 1.0 });
             context.SaveChanges();
-            Console.WriteLine("--> Dodano domyślny poziom gry.");
         }
     }
     catch (Exception ex)
     {
-        Console.WriteLine("--> Wystąpił błąd podczas inicjalizacji bazy danych: " + ex.Message);
+        Console.WriteLine("--> Wystąpił błąd DB: " + ex.Message);
     }
 }
 
-
-// Configure the HTTP request pipeline.
+// ==========================================
+// 3. KONFIGURACJA ŚRODOWISKA
+// ==========================================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+
+// NAPRAWA BŁĘDÓW 404 (Pozwala przeglądarce pobrać pliki CSS/JS)
+app.UseStaticFiles(); 
+
 app.UseRouting();
+
+// NAPRAWA LOGOWANIA (Pozwala zapisywać dane w sesji po wpisaniu dobrego hasła)
+app.UseSession(); 
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
