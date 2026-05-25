@@ -42,13 +42,14 @@ namespace GameTracker.Controllers
         {
             if (!IsAdmin()) return RedirectToAction("Index", "Home");
 
-            if (ModelState.IsValid)
-            {
-                _context.GameLevels.Add(level);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(level);
+            level.Id = 0; // Wymuszamy, by baza sama nadała ID
+            // Zastępujemy kropkę przecinkiem, jeśli ktoś wpisał ją na polskim systemie
+            level.DifficultyMultiplier = Convert.ToDouble(level.DifficultyMultiplier.ToString().Replace(".", ","));
+
+            _context.GameLevels.Add(level);
+            _context.SaveChanges();
+            
+            return RedirectToAction("Index");
         }
 
         // GET: /GameLevels/Edit/5 (Formularz edycji)
